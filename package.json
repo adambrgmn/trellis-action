@@ -6,6 +6,9 @@
     "main": "index.js",
     "author": "Steenbergen Design <arjan@steenbergen.design>",
     "license": "MIT",
+    "scripts": {
+        "build": "ncc build index.js"
+    },
     "devDependencies": {
         "@actions/core": "^1.1.0",
         "@actions/github": "^2.1.1",
