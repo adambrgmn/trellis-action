@@ -1,4 +1,5 @@
 const core = require('@actions/core');
+const github = require('@actions/github');
 const child_process = require('child_process');
 const fs = require('fs');
 const yaml = require('js-yaml');
@@ -105,10 +106,16 @@ function deploy_site(site_name, site, site_env){
         } catch (error) {
             core.error(`Symlinkin ${site_path} to ${ansible_site_path} failed: ${error.message}`);
         }
-    } 
+    }
 
     core.group(`Deploy Site ${site_name}`, async () => {
-        const deploy = await run_playbook(site_name, site_env, process.env['GITHUB_SHA']);
+        let site_version = process.env.GITHUB_SHA;
+
+        if (github.context.eventName === 'pull_request') {
+            site_version = github.context.payload.pull_request.head.sha;
+        }
+
+        const deploy = await run_playbook(site_name, site_env, site_version);
         return deploy;
     });
 }
