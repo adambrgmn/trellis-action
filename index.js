@@ -109,7 +109,7 @@ function deploy_site(site_name, site, site_env){
     }
 
     core.group(`Deploy Site ${site_name}`, async () => {
-        let site_version = process.env.GITHUB_SHA;
+        let site_version = github.context.sha;
 
         if (github.context.eventName === 'pull_request') {
             site_version = github.context.payload.pull_request.head.sha;
@@ -122,7 +122,7 @@ function deploy_site(site_name, site, site_env){
 
 function run_playbook(site_name, site_env, site_version) {
     try {
-        const child = child_process.spawnSync('ansible-playbook', ['deploy.yml',`-e site=${site_name}`, `-e env=${site_env}`, `-e site_version=${site_version}`, verbose && '-vvv'].filter(Boolean));
+        const child = child_process.spawnSync(`ansible-playbook deploy.yml -e site=${site_name} -e env=${site_env} -e site_version=${site_version} ${verbose ? '-vvv' : ''}`);
 
         if( child.stdout )
             console.log(`${child.stdout}`);
